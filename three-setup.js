@@ -6,6 +6,8 @@ let modelsLoaded = false;
 let animationMixer;
 let animations = {};
 let clock = new THREE.Clock();
+let particleSystem, particles;
+let bgParticles;
 
 // Setup for models
 const MODELS = {
@@ -29,6 +31,7 @@ function initScene() {
     renderer.setSize(document.getElementById('scene').clientWidth, document.getElementById('scene').clientHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     document.getElementById('scene').appendChild(renderer.domElement);
     
     // Add ambient light
@@ -39,6 +42,8 @@ function initScene() {
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(5, 10, 7);
     directionalLight.castShadow = true;
+    directionalLight.shadow.mapSize.width = 1024;
+    directionalLight.shadow.mapSize.height = 1024;
     scene.add(directionalLight);
     
     // Add spot light
@@ -53,6 +58,17 @@ function initScene() {
     const pointLight = new THREE.PointLight(0xaa42f5, 1, 100);
     pointLight.position.set(0, 3, 0);
     scene.add(pointLight);
+    
+    // Add pulsating light
+    const pulseLight = new THREE.PointLight(0x42f5d9, 1, 50);
+    pulseLight.position.set(0, -2, -5);
+    scene.add(pulseLight);
+    
+    // Animate the pulsating light
+    animatePulseLight(pulseLight);
+    
+    // Create background particles
+    createBackgroundParticles();
     
     // Add orbit controls
     controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -83,6 +99,55 @@ function initScene() {
     animate();
 }
 
+// Create background particles
+function createBackgroundParticles() {
+    const particleCount = 200;
+    bgParticles = new THREE.Group();
+    
+    const particleGeometry = new THREE.SphereGeometry(0.02, 8, 8);
+    
+    for (let i = 0; i < particleCount; i++) {
+        const particleMaterial = new THREE.MeshBasicMaterial({
+            color: new THREE.Color(
+                0.5 + Math.random() * 0.5,
+                0.5 + Math.random() * 0.5,
+                0.7 + Math.random() * 0.3
+            ),
+            transparent: true,
+            opacity: 0.3 + Math.random() * 0.5
+        });
+        
+        const particle = new THREE.Mesh(particleGeometry, particleMaterial);
+        
+        // Random position
+        particle.position.x = (Math.random() - 0.5) * 20;
+        particle.position.y = (Math.random() - 0.5) * 20;
+        particle.position.z = (Math.random() - 0.5) * 20;
+        
+        // Store original position for animation
+        particle.userData.originalPos = particle.position.clone();
+        
+        // Random speed
+        particle.userData.speed = 0.01 + Math.random() * 0.02;
+        
+        bgParticles.add(particle);
+    }
+    
+    scene.add(bgParticles);
+}
+
+// Animate pulsating light
+function animatePulseLight(light) {
+    const initialIntensity = light.intensity;
+    
+    function pulse() {
+        light.intensity = initialIntensity + Math.sin(Date.now() * 0.002) * 0.5;
+        requestAnimationFrame(pulse);
+    }
+    
+    pulse();
+}
+
 // Load 3D models with GLTFLoader
 function loadModels() {
     const loader = new THREE.GLTFLoader();
@@ -108,7 +173,7 @@ function loadModels() {
     // In a real implementation, you would replace these with actual GLTF models
     
     // Create rock model (sphere)
-    const rockGeometry = new THREE.SphereGeometry(0.8, 32, 32);
+    const rockGeometry = new THREE.DodecahedronGeometry(0.8, 2);
     const rockMaterial = new THREE.MeshStandardMaterial({ 
         color: 0x888888,
         roughness: 0.8,
@@ -120,13 +185,23 @@ function loadModels() {
     rockModel.receiveShadow = true;
     
     // Create paper model (plane)
-    const paperGeometry = new THREE.BoxGeometry(1.2, 0.1, 1.2);
+    const paperGeometry = new THREE.BoxGeometry(1.2, 0.1, 1.2, 3, 1, 3);
     const paperMaterial = new THREE.MeshStandardMaterial({ 
         color: 0xffffff,
         roughness: 0.5,
-        metalness: 0.1
+        metalness: 0.1,
+        flatShading: true
     });
     paperModel = new THREE.Mesh(paperGeometry, paperMaterial);
+    
+    // Deform the paper geometry to make it more like a piece of paper
+    const vertices = paperGeometry.attributes.position.array;
+    for (let i = 0; i < vertices.length; i += 3) {
+        vertices[i + 1] += Math.sin(vertices[i] * 2) * 0.05;
+        vertices[i + 1] += Math.cos(vertices[i + 2] * 3) * 0.05;
+    }
+    paperGeometry.attributes.position.needsUpdate = true;
+    
     paperModel.castShadow = true;
     paperModel.receiveShadow = true;
     
@@ -140,12 +215,27 @@ function loadModels() {
         metalness: 0.8
     });
     
+    // Add blades to the scissors
+    const bladeGeometry = new THREE.ConeGeometry(0.15, 0.8, 32);
+    const bladeMaterial = new THREE.MeshStandardMaterial({
+        color: 0xe0e0e0,
+        metalness: 0.9,
+        roughness: 0.2
+    });
+    
     const handle1 = new THREE.Mesh(cylinderGeometry, scissorsMaterial);
     handle1.position.set(0.2, 0, 0);
     handle1.rotation.z = Math.PI / 4;
     handle1.castShadow = true;
     handle1.receiveShadow = true;
     scissorsModel.add(handle1);
+    
+    const blade1 = new THREE.Mesh(bladeGeometry, bladeMaterial);
+    blade1.position.set(0.2 + Math.sin(Math.PI / 4) * 0.8, Math.cos(Math.PI / 4) * 0.8, 0);
+    blade1.rotation.z = Math.PI / 4;
+    blade1.castShadow = true;
+    blade1.receiveShadow = true;
+    scissorsModel.add(blade1);
     
     const handle2 = new THREE.Mesh(cylinderGeometry, scissorsMaterial);
     handle2.position.set(-0.2, 0, 0);
@@ -154,8 +244,15 @@ function loadModels() {
     handle2.receiveShadow = true;
     scissorsModel.add(handle2);
     
+    const blade2 = new THREE.Mesh(bladeGeometry, bladeMaterial);
+    blade2.position.set(-0.2 - Math.sin(Math.PI / 4) * 0.8, Math.cos(Math.PI / 4) * 0.8, 0);
+    blade2.rotation.z = -Math.PI / 4;
+    blade2.castShadow = true;
+    blade2.receiveShadow = true;
+    scissorsModel.add(blade2);
+    
     // Create plane for shadow
-    const groundGeometry = new THREE.PlaneGeometry(10, 10);
+    const groundGeometry = new THREE.PlaneGeometry(20, 20);
     const groundMaterial = new THREE.MeshStandardMaterial({ 
         color: 0x221052,
         roughness: 0.8,
@@ -166,6 +263,14 @@ function loadModels() {
     ground.rotation.x = Math.PI / 2;
     ground.position.y = -1.5;
     ground.receiveShadow = true;
+    
+    // Add grid lines to the ground
+    const gridHelper = new THREE.GridHelper(20, 20, 0x6c42f5, 0x341080);
+    gridHelper.position.y = -1.49;
+    gridHelper.material.opacity = 0.2;
+    gridHelper.material.transparent = true;
+    scene.add(gridHelper);
+    
     scene.add(ground);
     
     // Notify loading manager that models are loaded
@@ -184,6 +289,7 @@ function animate() {
     requestAnimationFrame(animate);
     
     const delta = clock.getDelta();
+    const time = clock.getElapsedTime();
     
     // Update animation mixer if exists
     if (animationMixer) {
@@ -193,10 +299,29 @@ function animate() {
     // Rotate models slightly
     if (userModelGroup.children.length > 0) {
         userModelGroup.children[0].rotation.y += 0.01;
+        userModelGroup.children[0].position.y = Math.sin(time * 2) * 0.1;
     }
     
     if (computerModelGroup.children.length > 0) {
         computerModelGroup.children[0].rotation.y += 0.01;
+        computerModelGroup.children[0].position.y = Math.sin(time * 2 + Math.PI) * 0.1;
+    }
+    
+    // Animate background particles
+    if (bgParticles) {
+        bgParticles.children.forEach(particle => {
+            // Make particles float around
+            particle.position.y += Math.sin(time + particle.position.x) * 0.002;
+            particle.position.x += Math.cos(time + particle.position.z) * 0.002;
+            
+            // Reset particles that move too far
+            if (particle.position.distanceTo(particle.userData.originalPos) > 2) {
+                particle.position.copy(particle.userData.originalPos);
+            }
+            
+            // Pulse opacity
+            particle.material.opacity = (0.3 + Math.sin(time * particle.userData.speed) * 0.2);
+        });
     }
     
     // Update controls
