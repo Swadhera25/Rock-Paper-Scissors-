@@ -9,6 +9,9 @@
     --win-color: #00ff95;
     --lose-color: #ff416c;
     --draw-color: #ffae00;
+    --win-bg: rgba(0, 255, 149, 0.2);
+    --lose-bg: rgba(255, 65, 108, 0.2);
+    --draw-bg: rgba(255, 174, 0, 0.2);
 }
 
 * {
@@ -26,25 +29,39 @@ body {
     justify-content: center;
     align-items: center;
     overflow-x: hidden;
+    transition: background-color 0.7s ease;
+    padding: 10px;
+}
+
+body.win-bg {
+    background-color: var(--win-bg);
+}
+
+body.lose-bg {
+    background-color: var(--lose-bg);
+}
+
+body.draw-bg {
+    background-color: var(--draw-bg);
 }
 
 .game-container {
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 10px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 10px;
 }
 
 .header {
     text-align: center;
-    padding: 10px;
+    padding: 5px;
 }
 
 .header h1 {
-    font-size: 2.5rem;
+    font-size: 2rem;
     text-transform: uppercase;
     letter-spacing: 2px;
     text-shadow: 0 0 10px var(--glow-color), 0 0 20px var(--glow-color);
@@ -55,7 +72,7 @@ body {
     display: flex;
     justify-content: center;
     gap: 50px;
-    padding: 15px;
+    padding: 10px;
     background-color: var(--secondary-color);
     border-radius: 15px;
     box-shadow: 0 0 15px rgba(108, 66, 245, 0.3);
@@ -83,7 +100,7 @@ body {
 .result-display {
     text-align: center;
     font-size: 1.5rem;
-    height: 60px;
+    height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -112,22 +129,21 @@ body {
 
 .gameplay-wrapper {
     display: flex;
+    flex-direction: row;
     justify-content: space-between;
-    align-items: stretch;
+    align-items: flex-start;
     gap: 20px;
     width: 100%;
-    flex-wrap: nowrap;
 }
 
 .scene-container {
     width: 65%;
-    height: 400px;
+    height: 320px;
     position: relative;
     border-radius: 15px;
     overflow: hidden;
     background-color: var(--secondary-color);
     box-shadow: 0 0 20px rgba(108, 66, 245, 0.5);
-    flex-shrink: 0;
 }
 
 #scene {
@@ -136,27 +152,26 @@ body {
 }
 
 .gameplay-sidebar {
-    width: 30%;
+    width: 32%;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    min-width: 250px;
+    gap: 15px;
 }
 
 .controls {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 15px;
-    padding: 20px;
+    gap: 10px;
+    padding: 15px;
     background-color: var(--secondary-color);
     border-radius: 15px;
     box-shadow: 0 0 15px rgba(108, 66, 245, 0.3);
 }
 
 .control-btn {
-    padding: 15px 30px;
-    font-size: 1.2rem;
+    padding: 12px 20px;
+    font-size: 1.1rem;
     text-transform: uppercase;
     font-weight: bold;
     color: var(--text-color);
@@ -187,15 +202,15 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 15px;
-    padding: 20px;
+    gap: 10px;
+    padding: 15px;
     background-color: var(--secondary-color);
     border-radius: 15px;
     box-shadow: 0 0 15px rgba(108, 66, 245, 0.3);
 }
 
 #reset-btn, #sound-toggle {
-    padding: 10px 20px;
+    padding: 10px 15px;
     font-size: 1rem;
     color: var(--text-color);
     background-color: var(--secondary-color);
@@ -223,38 +238,41 @@ body {
 }
 
 /* Media Queries for Responsiveness */
-@media (max-width: 992px) {
+@media (max-width: 992px) and (min-width: 769px) {
     .gameplay-wrapper {
-        flex-direction: column;
-    }
-    
-    .scene-container {
-        width: 100%;
-        height: 350px;
-    }
-    
-    .gameplay-sidebar {
-        width: 100%;
         flex-direction: row;
-    }
-    
-    .controls, .actions {
-        width: 48%;
-    }
-}
-
-@media (max-width: 768px) {
-    .header h1 {
-        font-size: 2rem;
-    }
-    
-    .gameplay-wrapper {
-        flex-direction: column;
+        flex-wrap: wrap;
     }
     
     .scene-container {
         width: 100%;
         height: 300px;
+        margin-bottom: 15px;
+    }
+    
+    .gameplay-sidebar {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    
+    .controls, .actions {
+        width: 49%;
+    }
+}
+
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .gameplay-wrapper {
+        flex-direction: column;
+    }
+    
+    .scene-container {
+        width: 100%;
+        height: 250px;
     }
     
     .gameplay-sidebar {
@@ -266,16 +284,22 @@ body {
         flex-direction: row;
         flex-wrap: wrap;
         width: 100%;
+        gap: 8px;
+        padding: 12px;
     }
 
     .control-btn {
         flex: 1 1 auto;
-        min-width: 100px;
+        min-width: 80px;
+        padding: 10px 15px;
+        font-size: 0.9rem;
     }
 
     .actions {
         flex-direction: row;
         width: 100%;
+        gap: 8px;
+        padding: 12px;
     }
 
     #reset-btn, #sound-toggle {
@@ -290,9 +314,23 @@ body {
 
     .scoreboard {
         gap: 20px;
+        padding: 8px;
+    }
+
+    .score-label {
+        font-size: 1rem;
+    }
+
+    #user-score, #computer-score {
+        font-size: 1.5rem;
     }
 
     .scene-container {
-        height: 250px;
+        height: 200px;
+    }
+    
+    .control-btn {
+        padding: 8px 10px;
+        font-size: 0.8rem;
     }
 } 

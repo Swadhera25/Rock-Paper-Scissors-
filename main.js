@@ -206,6 +206,9 @@ function updateUI(result) {
     let resultMessage;
     let resultClass;
     
+    // Remove previous background classes
+    document.body.classList.remove('win-bg', 'lose-bg', 'draw-bg');
+    
     switch(result) {
         case 'win':
             userScore++;
@@ -215,6 +218,7 @@ function updateUI(result) {
             playSound(winSound);
             animateWinner(true);
             focusCameraOnWinner(true);
+            document.body.classList.add('win-bg');
             break;
         case 'lose':
             computerScore++;
@@ -224,11 +228,13 @@ function updateUI(result) {
             playSound(loseSound);
             animateWinner(false);
             focusCameraOnWinner(false);
+            document.body.classList.add('lose-bg');
             break;
         case 'draw':
             resultMessage = 'It\'s a draw!';
             resultClass = 'draw';
             playSound(drawSound);
+            document.body.classList.add('draw-bg');
             break;
     }
     
@@ -255,10 +261,13 @@ function resetGame() {
     // Reset result text
     updateResultText('Choose your move!');
     
+    // Reset background color
+    document.body.classList.remove('win-bg', 'lose-bg', 'draw-bg');
+    
     // Reset camera
     resetCamera();
     
-    // Clear models
+    // Clear any displayed models
     clearModels();
 }
 
