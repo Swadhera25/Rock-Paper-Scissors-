@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Rock Paper Scissors</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>Rock Paper Scissors 3D</h1>
+        </div>
+        
+        <div class="scoreboard">
+            <div class="score-item">
+                <span class="score-label">You</span>
+                <span id="user-score">0</span>
+            </div>
+            <div class="score-item">
+                <span class="score-label">Computer</span>
+                <span id="computer-score">0</span>
+            </div>
+        </div>
+        
+        <div class="result-display">
+            <div id="result-text">Choose your move!</div>
+        </div>
+        
+        <div class="gameplay-wrapper">
+            <div class="scene-container">
+                <div id="scene"></div>
+            </div>
+            
+            <div class="gameplay-sidebar">
+                <div class="controls">
+                    <button id="rock-btn" class="control-btn">Rock</button>
+                    <button id="paper-btn" class="control-btn">Paper</button>
+                    <button id="scissors-btn" class="control-btn">Scissors</button>
+                </div>
+                
+                <div class="actions">
+                    <button id="reset-btn">Reset Score</button>
+                    <button id="sound-toggle">Sound: ON</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+    <script src="three-setup.js"></script>
+    <script src="main.js"></script>
+</body>
+</html> 
