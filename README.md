@@ -2,6 +2,9 @@
 
 An interactive 3D Rock Paper Scissors game built with HTML, CSS, JavaScript, and Three.js.
 
+![image](https://github.com/user-attachments/assets/6e2af177-79d7-47fe-886c-2df021553990)
+
+
 ## Features
 
 - Interactive 3D visuals for rock, paper, and scissors
